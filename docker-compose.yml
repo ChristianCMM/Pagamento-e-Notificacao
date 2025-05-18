@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_DB: pagamentos
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "4000:4000"
+    depends_on:
+      - rabbitmq
